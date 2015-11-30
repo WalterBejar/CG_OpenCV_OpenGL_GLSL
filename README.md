@@ -1,5 +1,7 @@
-#OpenCV + OpenGL + GLSL
+# OpenCV + OpenGL + GLSL
 
-Image Processing con OpenCV, OpenGL y GLSL.
+##Image Processing con OpenCV, OpenGL y GLSL.
 
-![Alt text](Example.jpg?raw=true "Example Image")
+<p align="center">
+  <img src="Example.jpg?raw=true" alt="Example Image"/>
+</p>
