@@ -28,6 +28,8 @@ GLfloat zFar = 200.0f;									// Far clip plane
 GLuint GreyScaleProg;									// Programa para shader escala de grises
 GLuint RedBlueProg;										// Porgrama para shader que cambia los canales rojo y azul
 GLuint FilterProg;
+GLuint DotProg;
+GLuint ThresProg;
 GLuint ShaderProg;
 
 bool isFilter = false;
@@ -55,6 +57,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 		case GLFW_KEY_R:
 			ShaderProg = RedBlueProg;
+			isFilter = false;
+			break;
+
+		case GLFW_KEY_D:
+			ShaderProg = DotProg;
+			isFilter = false;
+			break;
+
+		case GLFW_KEY_T:
+			ShaderProg = ThresProg;
 			isFilter = false;
 			break;
 
@@ -178,10 +190,6 @@ void initKernels()
 	array <float, 9> pv = { 1, 0, -1, 1, 0, -1, 1, 0, -1 };
 	kernelsNames.push_back("Previt Vertical");
 	kernels.push_back(pv);
-
-	array <float, 9> p = { 1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0, 2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0 };
-	kernelsNames.push_back("Película Vieja");
-	kernels.push_back(p);
 }
 
 void draw(cv::Mat &camFrame)
@@ -370,6 +378,8 @@ void initShaders()
 	GreyScaleProg = setShaders((char *) "shaders/Reg.vert", (char *) "shaders/GrayScale.frag");
 	RedBlueProg = setShaders((char *) "shaders/Reg.vert", (char *) "shaders/RedBlueSwap.frag");
 	FilterProg = setShaders((char *) "shaders/Reg.vert", (char *) "shaders/Filter.frag");
+	DotProg = setShaders((char *) "shaders/Reg.vert", (char *) "shaders/Dotted.frag");
+	ThresProg = setShaders((char *) "shaders/Reg.vert", (char *) "shaders/Thres.frag");
 	ShaderProg = GreyScaleProg;
 }
 
@@ -390,7 +400,11 @@ int main(int argc, char *argv[])
 {
 	locale::global(locale("spanish"));
 
-	cout << "Escriba el directorio donde se localizan las imágenes (i.e. c:\\imagenes): " << endl;
+	cout << "***********************************************" << endl;
+	cout << "* Image Processing con OpenCV + OpenGL + GLSL *" << endl;
+	cout << "***********************************************" << endl;
+	cout << " " << endl;
+	cout << "Directorio de imágenes (i.e. c:\\images): " << endl;
 
 	char* path_images = new char[500];
 	cin >> path_images;
@@ -401,9 +415,31 @@ int main(int argc, char *argv[])
 	open_imgs_dir(path_images, images, images_names, downScale_factor);
 	if (images.size() == 0)
 	{
-		char* error = "No se puede abrir los archivos.";
-		return exit_with_errors(error);
+		cout << "No se pudo abrir los archivos." << endl;
+		cout << "Usando directorio de imágenes del proyecto (\\images)." << endl;
+		cout << " " << endl;
+		path_images = "images";
+		open_imgs_dir(path_images, images, images_names, downScale_factor);
+
+		if (images.size() == 0)
+		{
+			char *error = "Imágenes de prueba no encontradas, saliendo del programa.";
+			return exit_with_errors(error);
+		}
 	}
+
+	cout << "***********************************************" << endl;
+	cout << "* Se puede escoger entre 5 shaders ************" << endl;
+	cout << "* Teclas a usar *******************************" << endl;
+	cout << "* G -> escala de grises ***********************" << endl;
+	cout << "* D -> efecto con círculos ********************" << endl;
+	cout << "* T -> efecto threshold ***********************" << endl;
+	cout << "* R -> cambio de canal R por B ****************" << endl;
+	cout << "* F -> filtros usando kernels *****************" << endl;
+	cout << "* (Usar arriba y abajo para filtros) **********" << endl;
+	cout << "* Esc -> para salir del programa **************" << endl;
+	cout << "***********************************************" << endl;
+	system("pause");
 		
 	GLFWwindow *window = initGL();
 
